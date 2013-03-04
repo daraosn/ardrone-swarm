@@ -1,0 +1,51 @@
+body {
+  background: url(/low_contrast_linen_@2X.png);
+  background-size: 256px;
+}
+
+#drones {
+  border: 1px solid;
+}
+
+#drones > .drone {
+  background: url(/furley_bg_@2X.png);
+  background-size: 600px;
+  border: 1px solid #333;
+  width: 340px;
+  height: 440px;
+  float: left;
+  margin: 5px;
+  border-radius: 5px;
+  box-shadow: inset 0px 2px 2px #fff, inset 0px -2px 2px #333, 5px 5px 5px #303030;
+}
+#drones > .drone:hover {
+  border: 1px dashed #aaa;
+}
+#drones > .drone:active {
+}
+#drones > .drone.control {
+}
+
+.drone > .ip {
+  float: right;
+  font-size: 10px;
+  margin: 3px 10px !important;
+}
+
+.drone > .camera {
+  background: url(/standby.png) center center no-repeat;
+  clear: both;
+  margin: 0 10px;
+
+  background-size: 320px;
+  width: 320px;
+  height: 180px;
+}
+
+.drone > .navdata {
+  margin: 0 10px;
+}
+
+.drone > .navdata .battery {
+  margin: 5px 0px;
+}
