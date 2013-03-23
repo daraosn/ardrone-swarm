@@ -37,6 +37,8 @@ window.Drone = (config) ->
         d._$wrapper.removeClass('control')
         d._$ip.removeClass('badge-success')
       socket.publish("/drone/enable", id: d.id, status: d.control) unless quiet
+    terminate: ->
+      clearInterval d._cameraTimer
     # private
     _$ip: _$div('ip badge')
     _$cameraImg: $('<img>')
@@ -62,13 +64,18 @@ window.Drone = (config) ->
   $('#drones').append(d._template)
 
   d.enable config.enabled, true
+  d._$cameraImg.click (e) ->
+    e.stopPropagation()
+    e.preventDefault()
+    socket.publish("/drone/camera", id: d.id, camera: "toggle")
+    false
   d._$wrapper.click ->
     d.toggle()
   d._$wrapper.dblclick (e) ->
     swarm.forEach (drone) ->
       drone.enable drone.id == d.id
 
-  setInterval ->
+  d._cameraTimer = setInterval ->
     d._$cameraImg.attr(src: "/drone/camera/#{d.id}/#{Math.random()}")
   , 100
 

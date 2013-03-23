@@ -3,9 +3,9 @@ faye = require "faye"
 path = require "path"
 
 network = [
-  '192.168.1.200',
-  '192.168.1.201',
-  '192.168.1.202',
+  '192.168.1.100',
+  '192.168.1.101',
+  '192.168.1.102',
 ]
 
 swarm = require "./swarm"
@@ -37,7 +37,7 @@ swarm.do (drone) ->
 
 app = express()
 app.configure ->
-  app.set('port', process.env.PORT || 3001)
+  app.set('port', process.env.PORT || 3000)
   app.use(app.router)
   app.use(express.static(path.join(__dirname, 'public')))
   app.use("/components", express.static(path.join(__dirname, 'components')))
@@ -45,7 +45,12 @@ server = require("http").createServer(app)
 
 # Initialize Sockets
 
-new faye.NodeAdapter(mount: '/faye', timeout: 45).attach(server)
+bayeux = new faye.NodeAdapter(mount: '/faye', timeout: 45)
+bayeux.attach(server)
+bayeux.bind "handshake", (clientId) ->
+  console.log "socket handshake!", clientId
+bayeux.bind "disconnect", (clientId) ->
+  console.log "socket disconnect!", clientId
 socket = new faye.Client("http://localhost:#{app.get("port")}/faye")
 
 # Configure routes
@@ -56,33 +61,38 @@ app.get "/drones", (req, res) ->
     drones.push
       id: drone.id
       ip: drone.ip
+      camera: drone.camera
       enabled: drone.enabled
   console.log "new client connection (sent %s drones)", drones.length
-  res.end(JSON.stringify(drones))
+  res.end JSON.stringify(drones)
 
 socket.subscribe "/drone/enable", (data) ->
   swarm.drones[data.id].enabled = data.status
-  console.log('set drone %s control to %s', data.id, data.status)
+  console.log 'set drone %s control to %s', data.id, data.status
+
+socket.subscribe "/drone/camera", (data) ->
+  swarm.drones[data.id].changeCamera data.camera
+  console.log 'set drone %s camera to %s', data.id, data.camera
 
 socket.subscribe "/swarm/move", (control) ->
-  console.log('swarm move', control)
+  console.log 'swarm move', control
   swarm.move(control)
 
 socket.subscribe "/swarm/animate", (animation) ->
-  console.log('swarm animate: ', animation)
+  console.log 'swarm animate: ', animation
   swarm.animate(animation)
 
 socket.subscribe "/swarm/action", (command) ->
-  console.log('swarm action: ', command)
+  console.log 'swarm action: ', command
   swarm.action(command)
 
 server.listen app.get("port"), ->
-  console.log("Express server listening on port " + app.get("port"))
+  console.log "Express server listening on port " + app.get("port")
 
 app.get "/drone/camera/:id/:random", (req, res) ->
-  res.header("Cache-Control", "no-cache, no-store"); # avoid high disk usage on client browser
-  res.header("Content-Type", "image/png"); # avoid client browser warning on missing mime
-  res.end(swarm.drones[req.params.id].pngBuffer, "binary")
+  res.header "Cache-Control", "no-cache, no-store" # avoid high disk usage on client browser
+  res.header "Content-Type", "image/png" # avoid client browser warning on missing mime
+  res.end swarm.drones[req.params.id].pngBuffer, "binary"
 
 # Additional tasks
 # setInterval (->

@@ -31,6 +31,12 @@ swarm.add = (config) ->
   drone.id = config.id || config.ip.split(".").pop()
   drone.ip = config.ip
   drone.enabled = false
+  drone.camera = 0
+  drone.changeCamera = (camera) ->
+    camera = !drone.camera + 0 if camera == "toggle"
+    camera = 0 unless typeof camera == "number"
+    drone.config('video:video_channel', ''+camera);
+    drone.camera = camera
   drone.control =
     x: 0
     y: 0
@@ -46,32 +52,32 @@ swarm.add = (config) ->
       control = drone.control
     if drone.isIddle()
       drone.stop()
-      console.log("drone.stop", drone.ip)
+      # console.log("drone.stop", drone.ip)
     else
       if control.x < 0
         drone.left -control.x
-        console.log("drone.left", drone.ip, -control.x)
+        # console.log("drone.left", drone.ip, -control.x)
       else if control.x > 0
         drone.right control.x
-        console.log("drone.right", drone.ip, control.x)
+        # console.log("drone.right", drone.ip, control.x)
       if control.y < 0
         drone.back -control.y
-        console.log("drone.back", drone.ip, -control.y)
+        # console.log("drone.back", drone.ip, -control.y)
       else if control.y > 0
         drone.front control.y
-        console.log("drone.front", drone.ip, control.y)
+        # console.log("drone.front", drone.ip, control.y)
       if control.z < 0
         drone.down -control.z
-        console.log("drone.down", drone.ip, -control.z)
+        # console.log("drone.down", drone.ip, -control.z)
       else if control.z > 0
         drone.up control.z
-        console.log("drone.up", drone.ip, control.z)
+        # console.log("drone.up", drone.ip, control.z)
       if control.r < 0
         drone.counterClockwise -control.r
-        console.log("drone.counterClockwise", drone.ip, -control.r)
+        # console.log("drone.counterClockwise", drone.ip, -control.r)
       else if control.r > 0
         drone.clockwise control.r
-        console.log("drone.clockwise", drone.ip, control.r)
+        # console.log("drone.clockwise", drone.ip, control.r)
     return control
   ##############################
   ## AR Drone SDK 2.0.1, page 36

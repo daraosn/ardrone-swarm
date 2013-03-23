@@ -1,4 +1,22 @@
-window.socket = new Faye.Client "/faye", timeout: 120
+window.socket = new Faye.Client "/faye", timeout: 1, retry: 1
+socket.bind "transport:down", ->
+  swarm.forEach (drone) -> drone.terminate()
+  $('body').append(
+    $('<div id="lost-connection">').css(
+      position: "fixed", top: 0, left: 0, width: '100%', height: '100%', opacity: 0.8, background: 'black'
+    ).append(
+      $('<div>').html(
+        'Lost connection with server<br><br><span id="reconnecting">- Reconnecting -</span>'
+      ).css(
+        color: "white", textAlign: "center", fontSize: "16px", marginTop: "10px"
+      )
+    )
+  )
+  setInterval ->
+    $('#lost-connection #reconnecting').fadeOut().fadeIn()
+  , 1000
+  socket.bind "transport:up", ->
+    document.location.reload()
 
 # initialize drones
 
