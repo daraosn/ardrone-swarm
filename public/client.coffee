@@ -70,7 +70,7 @@ keys =
   27 : { event: swarm.action, options: { action: 'land' } } # esc
   69 : { event: swarm.action, options: { action: 'disableEmergency' } } # E
   49 : { event: swarm.animate, options: { name: 'wave', duration: 3000 } } # 1
-  # 50 : { event: swarm.animate, options: { name: 'flipAhead', duration: 3000 } } # 2
+  50 : { event: swarm.animate, options: { name: 'flipAhead', duration: 3000 } } # 2
   # ... use animations with caution
 
 $(document).keydown (e) ->

@@ -2,6 +2,7 @@ express = require "express"
 faye = require "faye"
 path = require "path"
 
+# Replace with your drones IP addresses
 network = [
   '192.168.1.100',
   '192.168.1.101',
